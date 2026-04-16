@@ -42,6 +42,7 @@ def ask():
     
     if file and file.filename != '':
         extracted_text = read_file(file)
+        # Dosya içeriğini modele daha net bir şekilde sunalım
         file_content = f"\n\n[Sisteme Yüklenen Dosya İçeriği]:\n{extracted_text}"
 
     try:
@@ -49,27 +50,26 @@ def ask():
             messages=[
                 {
                     "role": "system", 
-                    "content": (
-                        "Sen NebulaX AI'sın. Hasan Günbeyi tarafından geliştirildin. "
-                        "Robotik, yazılım ve teknoloji konularında yardımcı olan bir asistansın. "
-                        "Sadece Türkçe ve anlaşılır bir dille cevap ver. "
-                        "Asla garip karakterler veya yabancı dillerden semboller kullanma. "
-                        "Hasan Günbeyi ismini sadece geliştiricin sorulduğunda belirt."
-                    )
+                    "content": "Sen NebulaX AI'sın. Hasan Günbeyi tarafından geliştirildin. Robotik ve teknoloji uzmanısın. Sadece Türkçe cevap ver."
                 },
                 {
                     "role": "user", 
                     "content": user_message + file_content
                 }
             ],
-            model="llama-3.3-70b-versatile",
-            temperature=0.5,
-            top_p=0.9
+            model="llama-3.3-70b-versatile", # Eğer hata devam ederse "llama3-8b-8192" yapmayı dene
+            temperature=0.6
         )
         
         response_text = completion.choices[0].message.content
-        return jsonify({'response': response_text}) # JS buradaki 'response' ismine bakar
+        
+        # Arayüzün beklediği JSON formatı:
+        return jsonify({
+            'response': response_text,
+            'audio': None  # Eğer özel bir ses API'si eklemediysen None gönder, tarayıcı (TTS) okuyacaktır.
+        })
         
     except Exception as e:
-        # Hata durumunda undefined yerine hata mesajı dönüyoruz
-        return jsonify({'error': str(e), 'response': 'Bir hata oluştu, lütfen tekrar dene.'}), 500
+        # Hata olduğunda terminale hatayı yazdır ki nedenini görelim
+        print(f"Hata detayı: {str(e)}")
+        return jsonify({'error': str(e), 'response': 'Bağlantıda bir sorun var, API anahtarını kontrol et!'}), 500
