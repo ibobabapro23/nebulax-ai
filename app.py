@@ -40,8 +40,9 @@ def ask():
     file = request.files.get('file')
     file_content = ""
     
-    if file:
-        file_content = "\n[Dosya İçeriği]: " + read_file(file)
+    if file and file.filename != '':
+        extracted_text = read_file(file)
+        file_content = f"\n\n[Sisteme Yüklenen Dosya İçeriği]:\n{extracted_text}"
 
     try:
         completion = client.chat.completions.create(
@@ -67,11 +68,8 @@ def ask():
         )
         
         response_text = completion.choices[0].message.content
-        return jsonify({'response': response_text})
+        return jsonify({'response': response_text}) # JS buradaki 'response' ismine bakar
         
     except Exception as e:
-        return jsonify({'error': str(e)}), 500
-
-if __name__ == '__main__':
-    port = int(os.environ.get("PORT", 5000))
-    app.run(host='0.0.0.0', port=port)
+        # Hata durumunda undefined yerine hata mesajı dönüyoruz
+        return jsonify({'error': str(e), 'response': 'Bir hata oluştu, lütfen tekrar dene.'}), 500
