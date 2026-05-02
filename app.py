@@ -11,7 +11,7 @@ app = Flask(__name__)
 GEMINI_API_KEY = "AIzaSyCe0TD401QyEKYrBe5TByUNZ7YPyZ23bLo"
 
 genai.configure(api_key=GEMINI_API_KEY)
-model = genai.GenerativeModel('gemini-1.5-flash')
+model = genai.GenerativeModel('gemini-pro')
 
 def read_file(file):
     if not file or file.filename == '':
