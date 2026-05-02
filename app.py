@@ -16,7 +16,7 @@ if not GEMINI_API_KEY or GEMINI_API_KEY == "AIzaSy...":
     print("DİKKAT: Lütfen geçerli bir API Anahtarı girin!")
 
 genai.configure(api_key=GEMINI_API_KEY)
-model = genai.GenerativeModel('gemini-1.5-flash')
+model = genai.GenerativeModel('gemini-pro')
 
 def read_file(file):
     if not file or file.filename == '':
