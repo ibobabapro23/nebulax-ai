@@ -10,7 +10,7 @@ app = Flask(__name__)
 # Render'dan (Environment Variables) gelen API anahtarını alıyoruz
 # Eğer bulamazsa içindeki eski Groq anahtarını değil, güvenli bir hata döndürür
 # API anahtarını hem VITE_ hem de GOOGLE_API_KEY olarak kontrol etsin
-GEMINI_API_KEY = os.getenv("GOOGLE_API_KEY") or os.getenv("VITE_GEMINI_API_KEY")
+GEMINI_API_KEY = os.getenv("AIzaSyC8qIjPSWPawMdOL8vm6YX2CH5hm724Wnw") or os.getenv("AIzaSyC8qIjPSWPawMdOL8vm6YX2CH5hm724Wnw")
 
 if not GEMINI_API_KEY:
     print("DİKKAT: API Anahtarı bulunamadı!")
