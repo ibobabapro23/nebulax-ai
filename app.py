@@ -45,10 +45,16 @@ def ask():
     
     if file and file.filename != '':
         extracted_text = read_file(file)
-        file_content = f"\n\n[Dosya]:\n{extracted_text}"
+        file_content = f"\n\n[Dosya İçeriği]:\n{extracted_text}"
 
     try:
+        # Hatanın ne olduğunu anlamak için loglara yazdırıyoruz
+        print(f"İstek gönderiliyor: {user_message[:20]}...") 
+        
         prompt = f"Sen NebulaX AI'sın. Hasan Günbeyi tarafından geliştirildin. Robotik uzmanısın. Türkçe cevap ver.\n\nKullanıcı: {user_message}{file_content}"
+        
+        # En güncel model ismini kullanıyoruz
+        model = genai.GenerativeModel('gemini-1.5-flash')
         response = model.generate_content(prompt)
         
         return jsonify({
@@ -56,7 +62,9 @@ def ask():
             'audio': None 
         })
     except Exception as e:
-        return jsonify({'error': str(e), 'response': 'Gemini bağlantı hatası!'}), 500
-
-if __name__ == '__main__':
-    app.run(debug=True)
+        # Render loglarında asıl hatayı görmemizi sağlar
+        print(f"!!! GEMINI HATASI: {str(e)}") 
+        return jsonify({
+            'error': str(e), 
+            'response': f"Bağlantı kurulamadı. Hata: {str(e)}" 
+        }), 500
