@@ -1,14 +1,19 @@
 import os
 from flask import Flask, render_template, request, jsonify
-from groq import Groq
+import google.generativeai as genai
 import PyPDF2
 import docx
 
 # Flask uygulamasını başlatıyoruz
 app = Flask(__name__)
 
-# Groq API Anahtarın
-client = Groq(api_key="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")
+# Render'dan (Environment Variables) gelen API anahtarını alıyoruz
+# Eğer bulamazsa içindeki eski Groq anahtarını değil, güvenli bir hata döndürür
+GEMINI_API_KEY = os.getenv("VITE_GEMINI_API_KEY")
+
+# Gemini Yapılandırması
+genai.configure(api_key=GEMINI_API_KEY)
+model = genai.GenerativeModel('gemini-1.5-flash')
 
 def read_file(file):
     if not file or file.filename == '':
@@ -42,34 +47,24 @@ def ask():
     
     if file and file.filename != '':
         extracted_text = read_file(file)
-        # Dosya içeriğini modele daha net bir şekilde sunalım
         file_content = f"\n\n[Sisteme Yüklenen Dosya İçeriği]:\n{extracted_text}"
 
     try:
-        completion = client.chat.completions.create(
-            messages=[
-                {
-                    "role": "system", 
-                    "content": "Sen NebulaX AI'sın. Hasan Günbeyi tarafından geliştirildin. Robotik ve teknoloji uzmanısın. Sadece Türkçe cevap ver."
-                },
-                {
-                    "role": "user", 
-                    "content": user_message + file_content
-                }
-            ],
-            model="llama-3.3-70b-versatile", # Eğer hata devam ederse "llama3-8b-8192" yapmayı dene
-            temperature=0.6
-        )
+        # Gemini API isteği
+        # Sistem talimatını (NebulaX kimliği) mesajın başına ekliyoruz
+        prompt = f"Sen NebulaX AI'sın. Hasan Günbeyi tarafından geliştirildin. Robotik ve teknoloji uzmanısın. Sadece Türkçe cevap ver.\n\nKullanıcı: {user_message}{file_content}"
         
-        response_text = completion.choices[0].message.content
+        response = model.generate_content(prompt)
+        response_text = response.text
         
-        # Arayüzün beklediği JSON formatı:
         return jsonify({
             'response': response_text,
-            'audio': None  # Eğer özel bir ses API'si eklemediysen None gönder, tarayıcı (TTS) okuyacaktır.
+            'audio': None 
         })
         
     except Exception as e:
-        # Hata olduğunda terminale hatayı yazdır ki nedenini görelim
         print(f"Hata detayı: {str(e)}")
-        return jsonify({'error': str(e), 'response': 'Bağlantıda bir sorun var, API anahtarını kontrol et!'}), 500
+        return jsonify({'error': str(e), 'response': 'Gemini bağlantısında bir sorun var, API anahtarını kontrol et!'}), 500
+
+if __name__ == '__main__':
+    app.run(debug=True)
