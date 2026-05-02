@@ -9,9 +9,12 @@ app = Flask(__name__)
 
 # Render'dan (Environment Variables) gelen API anahtarını alıyoruz
 # Eğer bulamazsa içindeki eski Groq anahtarını değil, güvenli bir hata döndürür
-GEMINI_API_KEY = os.getenv("AIzaSyC8qIjPSWPawMdOL8vm6YX2CH5hm724Wnw")
+# API anahtarını hem VITE_ hem de GOOGLE_API_KEY olarak kontrol etsin
+GEMINI_API_KEY = os.getenv("GOOGLE_API_KEY") or os.getenv("VITE_GEMINI_API_KEY")
 
-# Gemini Yapılandırması
+if not GEMINI_API_KEY:
+    print("DİKKAT: API Anahtarı bulunamadı!")
+
 genai.configure(api_key=GEMINI_API_KEY)
 model = genai.GenerativeModel('gemini-1.5-flash')
 
