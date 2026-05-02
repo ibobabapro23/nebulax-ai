@@ -7,8 +7,8 @@ import docx
 # ÇOK KRİTİK: Flask uygulamasını burada başlatıyoruz
 app = Flask(__name__)
 
-# API anahtarını doğrudan buraya, tırnak içine yapıştır
-GEMINI_API_KEY = "AIzaSyC8qIjPSWPawMdOL8vm6YX2CH5hm724Wnw"
+# Tırnakların içinde hiçbir boşluk olmadığından emin ol
+GEMINI_API_KEY = "AIzaSyC8qlJPsWPawMDoL8vm6YX2CHShm724Wnw"
 
 genai.configure(api_key=GEMINI_API_KEY)
 model = genai.GenerativeModel('gemini-pro')
