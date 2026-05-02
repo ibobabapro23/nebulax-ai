@@ -1,11 +1,18 @@
 import os
+from flask import Flask, render_template, request, jsonify
 import google.generativeai as genai
+import PyPDF2
+import docx
 
-# Anahtarı doğrudan buraya yapıştırıyoruz
+# ÇOK KRİTİK: Flask uygulamasını burada başlatıyoruz
+app = Flask(__name__)
+
+# API anahtarını doğrudan buraya, tırnak içine yapıştır
 GEMINI_API_KEY = "AIzaSyC8qIjPSWPawMdOL8vm6YX2CH5hm724Wnw"
 
 genai.configure(api_key=GEMINI_API_KEY)
 model = genai.GenerativeModel('gemini-pro')
+
 def read_file(file):
     if not file or file.filename == '':
         return ""
@@ -38,24 +45,18 @@ def ask():
     
     if file and file.filename != '':
         extracted_text = read_file(file)
-        file_content = f"\n\n[Sisteme Yüklenen Dosya İçeriği]:\n{extracted_text}"
+        file_content = f"\n\n[Dosya]:\n{extracted_text}"
 
     try:
-        # Gemini API isteği
-        # Sistem talimatını (NebulaX kimliği) mesajın başına ekliyoruz
-        prompt = f"Sen NebulaX AI'sın. Hasan Günbeyi tarafından geliştirildin. Robotik ve teknoloji uzmanısın. Sadece Türkçe cevap ver.\n\nKullanıcı: {user_message}{file_content}"
-        
+        prompt = f"Sen NebulaX AI'sın. Hasan Günbeyi tarafından geliştirildin. Robotik uzmanısın. Türkçe cevap ver.\n\nKullanıcı: {user_message}{file_content}"
         response = model.generate_content(prompt)
-        response_text = response.text
         
         return jsonify({
-            'response': response_text,
+            'response': response.text,
             'audio': None 
         })
-        
     except Exception as e:
-        print(f"Hata detayı: {str(e)}")
-        return jsonify({'error': str(e), 'response': 'Gemini bağlantısında bir sorun var, API anahtarını kontrol et!'}), 500
+        return jsonify({'error': str(e), 'response': 'Gemini bağlantı hatası!'}), 500
 
 if __name__ == '__main__':
     app.run(debug=True)
