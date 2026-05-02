@@ -8,10 +8,10 @@ import docx
 app = Flask(__name__)
 
 # Tırnakların içinde hiçbir boşluk olmadığından emin ol
-GEMINI_API_KEY = "AIzaSyC8qlJPsWPawMDoL8vm6YX2CHShm724Wnw"
+GEMINI_API_KEY = "AIzaSyCe0TD401QyEKYrBe5TByUNZ7YPyZ23bLo"
 
 genai.configure(api_key=GEMINI_API_KEY)
-model = genai.GenerativeModel('gemini-pro')
+model = genai.GenerativeModel('gemini-1.5-flash')
 
 def read_file(file):
     if not file or file.filename == '':
